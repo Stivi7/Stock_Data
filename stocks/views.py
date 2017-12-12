@@ -1,27 +1,38 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 import json
 from alpha_vantage.timeseries import TimeSeries
 import matplotlib.pyplot as plt
-from django.template import RequestContext, Template
+from io import StringIO, BytesIO
+from django.core.files.base import ContentFile
+from .models import Stock
+
+
+
 
 ts = TimeSeries(key='YDS2B660JTJ220OR', output_format='pandas')
 
 
 def home(request):
-    return render(request, 'stocks/home.html')
+    s = Stock.objects.all()
+    return render(request, 'stocks/home.html', {'stocks': s})
 
 
 def stock_data(request):
     if request.method == 'POST':
         tag = request.POST['tag']
-        data, meta_data = ts.get_daily(symbol=tag, outputsize='full')
+        data, meta_data = ts.get_monthly(symbol=tag)
         data['close'].plot()
 
+        f = BytesIO()
+        plt.savefig(f)
 
-        response = HttpResponse(content_type="image/png")
-        plt.title('Daily Time Series for ' + tag)
-        plt.savefig(response, format="png")
-        return response
+        # file to be saved in database
+        content_file = ContentFile(f.getvalue())
+        s_create = Stock.objects.create(name_tag=tag, chart_img=content_file)
+        s_create.save()
+        return redirect('home')
+
+
 
 
