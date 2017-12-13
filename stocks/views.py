@@ -25,12 +25,10 @@ def stock_data(request):
         data, meta_data = ts.get_monthly(symbol=tag)
         data['close'].plot()
         f = BytesIO()
-
         plt.savefig(f, format='png')
         # file to be saved in database
-
-        content_file = ContentFile(f.getvalue())
-        print(content_file)
+        content_file = ImageFile(f)
+        content_file.name = tag
         s_create = Stock.objects.create(name_tag=tag, chart_img=content_file)
         s_create.save()
         return redirect('home')
