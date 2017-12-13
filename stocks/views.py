@@ -5,6 +5,7 @@ from alpha_vantage.timeseries import TimeSeries
 import matplotlib.pyplot as plt
 from io import StringIO, BytesIO
 from django.core.files.base import ContentFile
+from django.core.files.images import ImageFile
 from .models import Stock
 
 
@@ -23,12 +24,13 @@ def stock_data(request):
         tag = request.POST['tag']
         data, meta_data = ts.get_monthly(symbol=tag)
         data['close'].plot()
-
         f = BytesIO()
-        plt.savefig(f)
 
+        plt.savefig(f, format='png')
         # file to be saved in database
+
         content_file = ContentFile(f.getvalue())
+        print(content_file)
         s_create = Stock.objects.create(name_tag=tag, chart_img=content_file)
         s_create.save()
         return redirect('home')

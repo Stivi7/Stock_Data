@@ -4,7 +4,7 @@ from django.db import models
 
 class Stock(models.Model):
     name_tag = models.CharField(max_length=20)
-    chart_img = models.ImageField(upload_to='media/')
+    chart_img = models.ImageField()
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
