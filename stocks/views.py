@@ -29,7 +29,9 @@ def stock_data(request):
         # file to be saved in database
         content_file = ImageFile(f)
         content_file.name = tag
-        s_create = Stock.objects.create(name_tag=tag, chart_img=content_file)
+        s_create, created = Stock.objects.update_or_create(
+            name_tag=tag,
+            defaults={'name_tag': tag, 'chart_img': content_file})
         s_create.save()
         return redirect('home')
 
