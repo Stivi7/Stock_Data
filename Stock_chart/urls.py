@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.home, name='home'),
     url(r'^api/stocks/$', views.stock_data, name='stock_data'),
+    url(r'^delete/(?P<pk>[0-9]+)/$', views.DeleteStock.as_view(), name='delete-stock')
 ]
 
 if settings.DEBUG:

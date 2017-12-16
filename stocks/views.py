@@ -7,8 +7,8 @@ from io import StringIO, BytesIO
 from django.core.files.base import ContentFile
 from django.core.files.images import ImageFile
 from .models import Stock
-
-
+from django.views.generic.edit import DeleteView
+from django.urls import reverse_lazy
 
 
 ts = TimeSeries(key='YDS2B660JTJ220OR', output_format='pandas')
@@ -25,6 +25,7 @@ def stock_data(request):
         data, meta_data = ts.get_monthly(symbol=tag)
         data['close'].plot()
         f = BytesIO()
+        plt.title(tag + ' monthly stock data')
         plt.savefig(f, format='png')
         # file to be saved in database
         content_file = ImageFile(f)
@@ -35,6 +36,7 @@ def stock_data(request):
         s_create.save()
         return redirect('home')
 
-
-
+class DeleteStock(DeleteView):
+    model = Stock
+    success_url = reverse_lazy('home')
 
